@@ -3,7 +3,7 @@ from pathlib import Path
 
 from config import BASE_URL
 from games.TLC.logic import generate_target_codes, generate_tlc_reward
-from resource_service import add_resource, get_resource
+from resource_service import add_resource_with_hit_log, get_resource
 
 
 # =========================
@@ -180,18 +180,26 @@ def tlc_reward():
     if error_response:
         return error_response
 
+    hit_code = str(data.get("hit_code") or "").strip()
+    try_count = data.get("try_count")
+
     reward = generate_tlc_reward()
 
-    amount = add_resource(
+    result = add_resource_with_hit_log(
         bot_id=bot_id,
         user_id=user_id,
         resource_key=TLC_RESOURCE_KEY,
-        amount=reward
+        amount=reward,
+        game_id=TLC_GAME["id"],
+        hit_code=hit_code,
+        try_count=try_count,
+        keep_limit=100
     )
 
     return jsonify({
         "ok": True,
         "resource_key": TLC_RESOURCE_KEY,
         "reward": reward,
-        "amount": amount
+        "amount": result["amount"],
+        "log_id": result["log_id"]
     })

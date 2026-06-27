@@ -65,6 +65,40 @@ def init_db():
         )
         """)
 
+        # =========================
+        # 全遊戲共用命中紀錄表
+        # 只保留每個 bot / 玩家 / 遊戲最新 100 筆命中紀錄
+        # 空包也會記錄 reward = 0
+        # =========================
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS game_hit_logs (
+            id SERIAL PRIMARY KEY,
+
+            bot_id TEXT NOT NULL,
+            user_id TEXT NOT NULL,
+            game_id TEXT NOT NULL,
+
+            resource_key TEXT NOT NULL,
+            hit_code TEXT NOT NULL,
+            reward BIGINT NOT NULL DEFAULT 0 CHECK (reward >= 0),
+            amount_after BIGINT NOT NULL DEFAULT 0 CHECK (amount_after >= 0),
+            try_count BIGINT,
+
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+        """)
+
+        cursor.execute("""
+        CREATE INDEX IF NOT EXISTS idx_game_hit_logs_lookup
+        ON game_hit_logs (
+            bot_id,
+            user_id,
+            game_id,
+            created_at DESC,
+            id DESC
+        )
+        """)
+
         conn.commit()
 
     except Exception:

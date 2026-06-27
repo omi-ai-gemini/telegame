@@ -246,3 +246,130 @@ def spend_resource(bot_id, user_id, resource_key: str, amount: int):
 
     finally:
         conn.close()
+
+
+# =========================
+# 增加資源並寫入命中紀錄
+# 這個函式會在同一個 DB transaction 內完成：
+# 1. 增加資源，amount 可以是 0
+# 2. 新增命中紀錄，空包也會記錄 reward = 0
+# 3. 只保留同 bot / 同玩家 / 同遊戲最新 100 筆紀錄
+# =========================
+def add_resource_with_hit_log(
+    bot_id,
+    user_id,
+    resource_key: str,
+    amount: int,
+    game_id: str,
+    hit_code: str,
+    try_count=None,
+    keep_limit: int = 100
+):
+    bot_id = _normalize_key(bot_id)
+    user_id = _normalize_key(user_id)
+    resource_key = _normalize_key(resource_key).upper()
+    game_id = _normalize_key(game_id).lower()
+    hit_code = _normalize_key(hit_code)
+    amount = int(amount)
+    keep_limit = int(keep_limit)
+
+    if amount < 0:
+        raise ValueError("add_resource_with_hit_log amount must be >= 0")
+
+    if keep_limit <= 0:
+        raise ValueError("keep_limit must be > 0")
+
+    if try_count is not None:
+        try_count = int(try_count)
+
+    conn = get_conn()
+
+    try:
+        cursor = conn.cursor()
+
+        cursor.execute("""
+        INSERT INTO player_resources (
+            bot_id,
+            user_id,
+            resource_key,
+            amount,
+            updated_at
+        )
+        VALUES (%s, %s, %s, %s, CURRENT_TIMESTAMP)
+
+        ON CONFLICT (bot_id, user_id, resource_key)
+
+        DO UPDATE SET
+            amount = player_resources.amount + EXCLUDED.amount,
+            updated_at = CURRENT_TIMESTAMP
+
+        RETURNING amount
+        """, (
+            bot_id,
+            user_id,
+            resource_key,
+            amount
+        ))
+
+        new_amount = int(cursor.fetchone()[0])
+
+        cursor.execute("""
+        INSERT INTO game_hit_logs (
+            bot_id,
+            user_id,
+            game_id,
+            resource_key,
+            hit_code,
+            reward,
+            amount_after,
+            try_count
+        )
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+        RETURNING id
+        """, (
+            bot_id,
+            user_id,
+            game_id,
+            resource_key,
+            hit_code,
+            amount,
+            new_amount,
+            try_count
+        ))
+
+        log_id = int(cursor.fetchone()[0])
+
+        cursor.execute("""
+        DELETE FROM game_hit_logs
+        WHERE id IN (
+            SELECT id
+            FROM (
+                SELECT id
+                FROM game_hit_logs
+                WHERE bot_id = %s
+                  AND user_id = %s
+                  AND game_id = %s
+                ORDER BY created_at DESC, id DESC
+                OFFSET %s
+            ) AS old_logs
+        )
+        """, (
+            bot_id,
+            user_id,
+            game_id,
+            keep_limit
+        ))
+
+        conn.commit()
+
+        return {
+            "amount": new_amount,
+            "log_id": log_id
+        }
+
+    except Exception:
+        conn.rollback()
+        raise
+
+    finally:
+        conn.close()

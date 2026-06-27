@@ -113,7 +113,7 @@ async function loadBalance() {
 // 命中後向後端領取 TLC
 // 產出數量由後端判定，並寫入 DB
 // =========================
-async function claimTlcReward() {
+async function claimTlcReward(code) {
   if (!hasPlayerIdentity()) {
     throw new Error("missing_player_identity");
   }
@@ -125,7 +125,9 @@ async function claimTlcReward() {
     },
     body: JSON.stringify({
       bot_id: botId,
-      user_id: userId
+      user_id: userId,
+      hit_code: code,
+      try_count: tryCount
     })
   });
 
@@ -175,8 +177,9 @@ function renderHistoryRecords() {
 
 
 // =========================
-// 新增命中紀錄
-// 歷史紀錄只存在本次前端 RAM，不寫 DB
+// 新增畫面命中紀錄
+// 這裡只負責本次遊玩畫面顯示
+// 後端會另外把最新 100 筆命中紀錄寫入 DB
 // =========================
 function addHistoryRecord(code, reward) {
   hitCount += 1;
@@ -201,7 +204,7 @@ async function handleHit(code) {
   try {
     statusTextEl.textContent = `命中 ${code}，結算中...`;
 
-    const result = await claimTlcReward();
+    const result = await claimTlcReward(code);
     const reward = Number(result.reward || 0);
 
     tlc = Number(result.amount || 0);

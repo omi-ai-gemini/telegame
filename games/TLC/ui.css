@@ -32,6 +32,7 @@ body {
 .header-card {
   margin-top: 14px;
   padding: 22px;
+  text-align: center;
 }
 
 .game-title {
@@ -75,6 +76,14 @@ body {
 
 .scan-card {
   text-align: center;
+}
+
+.scan-card .card-title {
+  margin-bottom: 4px;
+}
+
+.scan-card .current-code {
+  padding: 8px 0 16px;
 }
 
 .current-code {
