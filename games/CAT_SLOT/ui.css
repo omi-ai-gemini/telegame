@@ -8,219 +8,128 @@ body {
   min-height: 100vh;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   background:
-    radial-gradient(circle at top, rgba(255, 255, 255, 0.95), transparent 28%),
-    linear-gradient(180deg, #fff6cf 0%, #ffe8c1 36%, #ffd9e8 72%, #dff4ff 100%);
-  color: #3c2a1b;
+    radial-gradient(circle at top, rgba(255, 255, 255, 0.92), transparent 32%),
+    linear-gradient(180deg, #fff7d8 0%, #ffecc7 38%, #ffd8bb 72%, #ffe8da 100%);
+  color: #3d2615;
+}
+
+body {
+  overflow-x: hidden;
 }
 
 .game {
   width: 100%;
-  max-width: 430px;
+  max-width: 470px;
   margin: 0 auto;
-  padding: 16px;
-}
-
-.top-banner {
-  margin-top: 12px;
-  padding: 18px 20px;
-  border-radius: 24px;
-  background: linear-gradient(135deg, #ffffff, #fff6d8);
-  border: 1px solid rgba(255, 183, 77, 0.45);
-  box-shadow: 0 12px 30px rgba(255, 170, 80, 0.20);
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-.top-banner-icon {
-  width: 54px;
-  height: 54px;
-  border-radius: 18px;
-  background: linear-gradient(135deg, #ffb347, #ff7eb6);
-  color: white;
-  font-size: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 8px 18px rgba(255, 126, 182, 0.28);
-}
-
-.top-banner-title {
-  font-size: 28px;
-  font-weight: 950;
-  letter-spacing: -0.5px;
-  color: #7a3e00;
-}
-
-.top-banner-subtitle {
-  margin-top: 5px;
-  font-size: 14px;
-  color: #9a6a3e;
-}
-
-.card {
-  margin-top: 16px;
-  padding: 18px;
-  border-radius: 24px;
-  background: rgba(255, 255, 255, 0.78);
-  border: 1px solid rgba(255, 185, 130, 0.42);
-  box-shadow: 0 12px 28px rgba(255, 153, 102, 0.16);
-}
-
-.card-title {
-  margin-bottom: 12px;
-  font-size: 14px;
-  font-weight: 800;
-  color: #a05c21;
-}
-
-.asset-row,
-.summary-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-}
-
-.asset-row + .asset-row,
-.summary-row + .summary-row {
-  margin-top: 10px;
-}
-
-.asset-row span,
-.summary-row span {
-  color: #9a6a3e;
-  font-weight: 700;
-}
-
-.asset-row strong,
-.summary-row strong {
-  font-size: 16px;
-  text-align: right;
-  color: #5b3514;
-}
-
-.bet-buttons {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 7px;
-}
-
-.bet-btn {
-  min-height: 42px;
-  border: 1px solid rgba(255, 169, 100, 0.45);
-  border-radius: 14px;
-  color: #7a3e00;
-  background: linear-gradient(180deg, #ffffff, #ffe7c9);
-  font-size: 13px;
-  font-weight: 900;
-  cursor: pointer;
-  box-shadow: 0 6px 14px rgba(255, 173, 96, 0.12);
-}
-
-.bet-btn.active {
-  border-color: #ff8c42;
-  color: white;
-  background: linear-gradient(135deg, #ff9a3d, #ff5ea8);
-  box-shadow: 0 0 20px rgba(255, 126, 182, 0.30);
-}
-
-.bet-note {
-  margin-top: 10px;
-  color: #a05c21;
-  font-size: 14px;
-  font-weight: 700;
-  text-align: center;
+  padding: 14px 12px 20px;
 }
 
 /* =========================
-   拉霸機主體
+   上方彩金
    ========================= */
-.slot-machine-card {
-  margin-top: 18px;
-  border-radius: 34px;
-  background: linear-gradient(180deg, #ff8c42 0%, #ff6f61 48%, #ff4f93 100%);
-  border: 4px solid #ffd36b;
-  box-shadow:
-    0 18px 42px rgba(255, 111, 97, 0.25),
-    inset 0 4px 10px rgba(255, 255, 255, 0.22),
-    inset 0 -12px 18px rgba(120, 30, 60, 0.18);
-  overflow: hidden;
-}
-
-.machine-top-lights {
-  height: 16px;
-  background:
-    radial-gradient(circle, #fff9bf 0 40%, transparent 42%) 0 0 / 24px 16px repeat-x;
-  opacity: 0.95;
-}
-
-.machine-header {
-  padding: 18px 20px 10px;
-  text-align: center;
-}
-
-.machine-jackpot {
-  display: inline-block;
-  padding: 8px 18px;
-  border-radius: 999px;
-  background: linear-gradient(180deg, #fff8df, #ffe79e);
-  color: #8d4d00;
-  font-size: 24px;
-  font-weight: 950;
-  letter-spacing: 1px;
-  box-shadow: 0 8px 18px rgba(128, 72, 0, 0.18);
-}
-
-.machine-mini-display {
-  margin-top: 10px;
-  color: rgba(255, 250, 240, 0.92);
-  font-size: 14px;
-  font-weight: 800;
-  letter-spacing: 0.3px;
-}
-
-.machine-body {
+.jackpot-bar {
+  min-height: 54px;
+  padding: 10px 16px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #fff9ea, #ffe8a8);
+  border: 1px solid rgba(234, 173, 51, 0.45);
+  box-shadow: 0 10px 22px rgba(221, 163, 56, 0.15);
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 8px 14px 0 18px;
+  justify-content: space-between;
+  gap: 12px;
 }
 
-.slot-machine-frame {
-  flex: 1;
-  padding: 14px;
-  border-radius: 26px;
-  background: linear-gradient(180deg, #ffe9ba, #ffc37d);
-  border: 3px solid rgba(255, 246, 210, 0.8);
+.jackpot-label {
+  color: #9b6517;
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.jackpot-amount {
+  color: #7b4200;
+  font-size: 16px;
+  font-weight: 950;
+  text-align: right;
+}
+
+/* =========================
+   機台主體
+   ========================= */
+.machine-stage {
+  margin-top: 14px;
+  display: flex;
+  justify-content: center;
+}
+
+.slot-machine {
+  width: 100%;
+  position: relative;
+  padding-right: 36px;
+}
+
+.slot-machine-top {
+  height: 18px;
+  margin: 0 auto;
+  width: calc(100% - 34px);
+  border-radius: 22px 22px 8px 8px;
+  background:
+    radial-gradient(circle, #fff6b3 0 38%, transparent 40%) 0 0 / 24px 18px repeat-x,
+    linear-gradient(180deg, #ffca59, #ff9e3d);
+  border: 3px solid #ffd96f;
+  border-bottom: none;
   box-shadow:
-    inset 0 3px 12px rgba(255, 255, 255, 0.45),
-    inset 0 -8px 16px rgba(170, 80, 0, 0.16);
+    0 8px 18px rgba(229, 135, 45, 0.14),
+    inset 0 3px 8px rgba(255, 255, 255, 0.38);
+}
+
+.slot-machine-body {
+  position: relative;
+  margin-top: -2px;
+  border-radius: 26px;
+  background: linear-gradient(180deg, #ffb24d 0%, #ff9147 36%, #ff724b 100%);
+  border: 4px solid #ffd563;
+  box-shadow:
+    0 18px 42px rgba(225, 122, 56, 0.22),
+    inset 0 4px 12px rgba(255, 255, 255, 0.20),
+    inset 0 -10px 18px rgba(126, 44, 13, 0.14);
+  padding: 18px 16px;
+}
+
+.slot-window-frame {
+  border-radius: 24px;
+  background: linear-gradient(180deg, #ffeec4, #ffc36d);
+  border: 3px solid rgba(255, 244, 219, 0.92);
+  box-shadow:
+    inset 0 3px 12px rgba(255, 255, 255, 0.48),
+    inset 0 -10px 16px rgba(166, 97, 22, 0.14);
+  padding: 14px;
 }
 
 .slot-window {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: 8px;
-  padding: 10px;
-  border-radius: 20px;
-  background: linear-gradient(180deg, #fffdf7, #fff3da);
-  border: 2px solid rgba(255, 189, 90, 0.7);
-  box-shadow: inset 0 2px 10px rgba(120, 80, 20, 0.10);
+  padding: 12px;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #fffdfa, #fff1d6);
+  border: 2px solid rgba(243, 194, 104, 0.78);
+  box-shadow:
+    inset 0 2px 10px rgba(124, 76, 13, 0.12),
+    0 4px 10px rgba(176, 101, 23, 0.08);
 }
 
 .slot-cell {
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 0.88 / 1;
   position: relative;
   overflow: hidden;
   border-radius: 16px;
-  background:
-    linear-gradient(180deg, #ffffff 0%, #fff7ea 100%);
-  border: 2px solid rgba(255, 197, 117, 0.78);
+  background: linear-gradient(180deg, #ffffff 0%, #fff6e7 100%);
+  border: 2px solid rgba(255, 203, 120, 0.88);
   box-shadow:
-    inset 0 2px 6px rgba(255, 255, 255, 0.75),
-    inset 0 -6px 10px rgba(190, 140, 70, 0.12),
-    0 6px 12px rgba(193, 132, 54, 0.12);
+    inset 0 2px 6px rgba(255, 255, 255, 0.85),
+    inset 0 -7px 12px rgba(192, 147, 81, 0.12),
+    0 6px 12px rgba(177, 116, 31, 0.12);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -230,27 +139,27 @@ body {
   content: "";
   position: absolute;
   top: 0;
-  left: 14%;
-  right: 14%;
-  height: 30%;
+  left: 12%;
+  right: 12%;
+  height: 28%;
   border-radius: 999px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.55), transparent);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.62), transparent);
   pointer-events: none;
 }
 
 .slot-cell img {
-  width: 78%;
-  height: 78%;
+  width: 90%;
+  height: 90%;
   object-fit: contain;
-  filter: drop-shadow(0 6px 8px rgba(90, 60, 20, 0.22));
+  filter: drop-shadow(0 8px 10px rgba(98, 60, 14, 0.22));
   display: none;
   position: relative;
   z-index: 2;
 }
 
 .slot-cell span {
-  font-size: 34px;
-  filter: drop-shadow(0 6px 8px rgba(90, 60, 20, 0.20));
+  font-size: 42px;
+  filter: drop-shadow(0 8px 10px rgba(98, 60, 14, 0.20));
   position: relative;
   z-index: 2;
 }
@@ -262,110 +171,240 @@ body {
 
 .slot-cell.stopped img,
 .slot-cell.stopped span {
-  animation: slotStop 0.22s ease-out;
+  animation: slotStop 0.18s ease-out;
 }
 
-.slot-side-decoration {
-  width: 42px;
-  height: 140px;
-  position: relative;
-  flex-shrink: 0;
+/* =========================
+   拉桿
+   ========================= */
+.machine-lever {
+  position: absolute;
+  right: 2px;
+  top: 64px;
+  width: 34px;
+  height: 188px;
+  pointer-events: none;
 }
 
 .lever-stick {
   position: absolute;
-  left: 17px;
+  left: 12px;
   top: 18px;
-  width: 8px;
-  height: 92px;
+  width: 9px;
+  height: 132px;
   border-radius: 999px;
-  background: linear-gradient(180deg, #fff4da, #d69b34);
-  box-shadow: inset 0 0 4px rgba(255,255,255,0.45);
+  background: linear-gradient(180deg, #fff7dd, #cc8b20);
+  box-shadow:
+    inset 0 0 4px rgba(255, 255, 255, 0.55),
+    0 4px 8px rgba(125, 65, 0, 0.18);
+  transform-origin: top center;
 }
 
 .lever-knob {
   position: absolute;
   top: 0;
-  left: 7px;
-  width: 28px;
-  height: 28px;
+  left: 1px;
+  width: 32px;
+  height: 32px;
   border-radius: 999px;
-  background: radial-gradient(circle at 30% 30%, #fff8d9, #ffce55 65%, #f39a18 100%);
-  box-shadow: 0 6px 12px rgba(160, 90, 0, 0.22);
+  background: radial-gradient(circle at 30% 30%, #fff0f0, #ff6868 58%, #d82929 100%);
+  box-shadow:
+    0 6px 12px rgba(146, 30, 30, 0.25),
+    inset 0 2px 4px rgba(255, 255, 255, 0.42);
+  transform-origin: center center;
 }
 
-.machine-footer {
-  padding: 14px 18px 18px;
+.machine-lever.pulling .lever-stick {
+  animation: leverPullStick 0.34s ease-in-out;
 }
 
-.status {
-  min-height: 22px;
-  padding: 12px 14px;
-  border-radius: 16px;
-  background: rgba(255, 248, 231, 0.88);
-  color: #8a4d16;
-  font-size: 15px;
-  font-weight: 800;
+.machine-lever.pulling .lever-knob {
+  animation: leverPullKnob 0.34s ease-in-out;
+}
+
+/* =========================
+   下方控制區
+   ========================= */
+.control-panel {
+  margin-top: 16px;
+  padding: 16px 14px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(243, 185, 109, 0.42);
+  box-shadow: 0 12px 24px rgba(222, 151, 76, 0.12);
+}
+
+.panel-block + .panel-block {
+  margin-top: 14px;
+}
+
+.panel-title {
+  margin-bottom: 10px;
+  color: #9a6322;
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.bet-buttons {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+}
+
+.bet-btn {
+  min-height: 40px;
+  border: 1px solid rgba(242, 168, 86, 0.45);
+  border-radius: 12px;
+  color: #83460d;
+  background: linear-gradient(180deg, #ffffff, #ffe8c8);
+  font-size: 12px;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(244, 173, 86, 0.10);
+}
+
+.bet-btn.active {
+  border-color: #ff9047;
+  color: white;
+  background: linear-gradient(135deg, #ff9b41, #ff6f7d);
+  box-shadow: 0 0 18px rgba(255, 132, 84, 0.22);
+}
+
+.bet-note {
+  margin-top: 9px;
   text-align: center;
+  color: #9b6323;
+  font-size: 14px;
+  font-weight: 800;
 }
 
-.actions {
-  margin-top: 18px;
+.action-buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
 }
 
-.main-btn,
-.sub-btn {
-  width: 100%;
-  height: 54px;
+.action-btn {
+  min-height: 42px;
   border: none;
-  border-radius: 18px;
-  font-size: 17px;
+  border-radius: 12px;
+  font-size: 13px;
   font-weight: 950;
   cursor: pointer;
 }
 
-.main-btn {
-  margin-top: 10px;
+.action-btn.primary {
   color: white;
-  background: linear-gradient(135deg, #ff9a3d, #ff5ea8);
-  box-shadow: 0 12px 28px rgba(255, 126, 182, 0.24);
+  background: linear-gradient(135deg, #ff983c, #ff6a62);
+  box-shadow: 0 8px 16px rgba(242, 128, 76, 0.18);
 }
 
-.sub-btn {
-  margin-top: 10px;
-  color: #7a3e00;
-  background: rgba(255, 255, 255, 0.75);
-  box-shadow: 0 8px 18px rgba(255, 170, 80, 0.12);
+.action-btn.stop {
+  color: white;
+  background: linear-gradient(135deg, #7a4cff, #4a78ff);
+  box-shadow: 0 8px 16px rgba(87, 105, 255, 0.18);
 }
 
-.main-btn:disabled,
-.sub-btn:disabled {
-  opacity: 0.52;
+.resource-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.resource-box {
+  min-height: 68px;
+  padding: 12px;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #fffaf1, #ffeecf);
+  border: 1px solid rgba(242, 197, 123, 0.52);
+  box-shadow: inset 0 2px 6px rgba(255, 255, 255, 0.70);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+}
+
+.resource-label {
+  color: #a16b2b;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.resource-value {
+  color: #6f3d08;
+  font-size: 15px;
+  font-weight: 950;
+  word-break: break-word;
+}
+
+.system-text {
+  margin-top: 12px;
+  text-align: center;
+  color: #99642a;
+  font-size: 13px;
+  font-weight: 800;
+  min-height: 18px;
+}
+
+.bet-btn:disabled,
+.action-btn:disabled {
+  opacity: 0.55;
   cursor: not-allowed;
 }
 
+/* =========================
+   動畫
+   ========================= */
 @keyframes slotPulse {
   0% {
-    transform: translateY(-8px) scale(0.94);
-    opacity: 0.72;
+    transform: translateY(-10px) scale(0.92);
+    opacity: 0.74;
   }
 
   100% {
-    transform: translateY(8px) scale(1.04);
+    transform: translateY(10px) scale(1.05);
     opacity: 1;
   }
 }
 
 @keyframes slotStop {
   0% {
-    transform: translateY(-10px) scale(0.92);
+    transform: translateY(-12px) scale(0.90);
   }
 
   65% {
-    transform: translateY(3px) scale(1.08);
+    transform: translateY(4px) scale(1.06);
   }
 
   100% {
     transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes leverPullStick {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  45% {
+    transform: rotate(14deg) translateY(10px);
+  }
+
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes leverPullKnob {
+  0% {
+    transform: translate(0, 0);
+  }
+
+  45% {
+    transform: translate(8px, 18px);
+  }
+
+  100% {
+    transform: translate(0, 0);
   }
 }

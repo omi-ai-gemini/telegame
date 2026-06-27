@@ -2,7 +2,6 @@
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
-
   <meta
     name="viewport"
     content="width=device-width, initial-scale=1.0"
@@ -11,115 +10,105 @@
   <title>貓咪拉霸機</title>
 
   <link rel="stylesheet" href="/games/cat-slot/ui.css">
-
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
 
   <main class="game">
 
-    <section class="top-banner">
-      <div class="top-banner-icon">🎰</div>
-      <div>
-        <div class="top-banner-title">貓咪拉霸機</div>
-        <div class="top-banner-subtitle">明亮版測試機台｜五格直線</div>
-      </div>
+    <section class="jackpot-bar">
+      <span class="jackpot-label">累積彩金</span>
+      <strong class="jackpot-amount" id="jackpot-amount">測試版未接入</strong>
     </section>
 
-    <section class="card balance-card">
-      <div class="asset-row">
-        <span>TLC</span>
-        <strong id="tlc-amount">測試版未接入</strong>
-      </div>
+    <section class="machine-stage">
 
-      <div class="asset-row">
-        <span>貓咪幣</span>
-        <strong id="cat-coin-amount">測試版未接入</strong>
-      </div>
-    </section>
+      <div class="slot-machine">
 
-    <section class="card bet-card">
-      <div class="card-title">每轉消耗</div>
+        <div class="slot-machine-top"></div>
 
-      <div class="bet-buttons" id="bet-buttons">
-        <button class="bet-btn active" data-bet="100">100</button>
-        <button class="bet-btn" data-bet="500">500</button>
-        <button class="bet-btn" data-bet="1000">1,000</button>
-        <button class="bet-btn" data-bet="5000">5,000</button>
-        <button class="bet-btn" data-bet="10000">10,000</button>
-      </div>
+        <div class="slot-machine-body">
+          <div class="slot-window-frame">
+            <div class="slot-window">
+              <div class="slot-cell" data-index="0">
+                <img id="slot-0" alt="拉霸符號 1">
+                <span id="slot-fallback-0">🐈‍⬛</span>
+              </div>
 
-      <div class="bet-note" id="bet-note">目前選擇：100 貓咪幣</div>
-    </section>
+              <div class="slot-cell" data-index="1">
+                <img id="slot-1" alt="拉霸符號 2">
+                <span id="slot-fallback-1">🐱</span>
+              </div>
 
-    <section class="slot-machine-card">
-      <div class="machine-top-lights"></div>
+              <div class="slot-cell" data-index="2">
+                <img id="slot-2" alt="拉霸符號 3">
+                <span id="slot-fallback-2">🤍</span>
+              </div>
 
-      <div class="machine-header">
-        <div class="machine-jackpot">MEOW SLOT</div>
-        <div class="machine-mini-display">Lucky Cats × TLC</div>
-      </div>
+              <div class="slot-cell" data-index="3">
+                <img id="slot-3" alt="拉霸符號 4">
+                <span id="slot-fallback-3">🌼</span>
+              </div>
 
-      <div class="machine-body">
-        <div class="slot-machine-frame">
-
-          <div class="slot-window">
-            <div class="slot-cell" data-index="0">
-              <img id="slot-0" alt="拉霸符號 1">
-              <span id="slot-fallback-0">🐈‍⬛</span>
-            </div>
-
-            <div class="slot-cell" data-index="1">
-              <img id="slot-1" alt="拉霸符號 2">
-              <span id="slot-fallback-1">🐱</span>
-            </div>
-
-            <div class="slot-cell" data-index="2">
-              <img id="slot-2" alt="拉霸符號 3">
-              <span id="slot-fallback-2">🤍</span>
-            </div>
-
-            <div class="slot-cell" data-index="3">
-              <img id="slot-3" alt="拉霸符號 4">
-              <span id="slot-fallback-3">🌼</span>
-            </div>
-
-            <div class="slot-cell" data-index="4">
-              <img id="slot-4" alt="拉霸符號 5">
-              <span id="slot-fallback-4">🪙</span>
+              <div class="slot-cell" data-index="4">
+                <img id="slot-4" alt="拉霸符號 5">
+                <span id="slot-fallback-4">🪙</span>
+              </div>
             </div>
           </div>
-
         </div>
 
-        <div class="slot-side-decoration">
-          <div class="lever-knob"></div>
+        <div class="machine-lever" id="machine-lever" aria-hidden="true">
           <div class="lever-stick"></div>
+          <div class="lever-knob"></div>
+        </div>
+
+      </div>
+    </section>
+
+    <section class="control-panel">
+
+      <div class="panel-block">
+        <div class="panel-title">每轉消耗</div>
+
+        <div class="bet-buttons" id="bet-buttons">
+          <button class="bet-btn active" data-bet="100">100</button>
+          <button class="bet-btn" data-bet="500">500</button>
+          <button class="bet-btn" data-bet="1000">1,000</button>
+          <button class="bet-btn" data-bet="5000">5,000</button>
+          <button class="bet-btn" data-bet="10000">10,000</button>
+        </div>
+
+        <div class="bet-note" id="bet-note">目前選擇：100 貓咪幣</div>
+      </div>
+
+      <div class="panel-block">
+        <div class="panel-title">轉動次數</div>
+
+        <div class="action-buttons">
+          <button class="action-btn primary" id="spin-once-btn">一次</button>
+          <button class="action-btn primary" id="spin-ten-btn">十次</button>
+          <button class="action-btn primary" id="auto-spin-btn">無限</button>
+          <button class="action-btn stop" id="stop-btn">停止</button>
         </div>
       </div>
 
-      <div class="machine-footer">
-        <div class="status" id="status-text">素材測試版已就緒</div>
-      </div>
-    </section>
+      <div class="panel-block">
+        <div class="resource-grid">
+          <div class="resource-box">
+            <span class="resource-label">TLC</span>
+            <strong class="resource-value" id="tlc-amount">測試版未接入</strong>
+          </div>
 
-    <section class="card summary-card">
-      <div class="summary-row">
-        <span>本次轉動</span>
-        <strong id="spin-count">0</strong>
+          <div class="resource-box">
+            <span class="resource-label">CatCoin</span>
+            <strong class="resource-value" id="cat-coin-amount">測試版未接入</strong>
+          </div>
+        </div>
       </div>
 
-      <div class="summary-row">
-        <span>最後結果</span>
-        <strong id="last-result">尚未轉動</strong>
-      </div>
-    </section>
+      <div class="system-text" id="status-text">素材測試版已就緒</div>
 
-    <section class="actions">
-      <button class="main-btn" id="spin-once-btn">轉一次</button>
-      <button class="main-btn" id="spin-ten-btn">轉十次</button>
-      <button class="main-btn" id="auto-spin-btn">無限轉</button>
-      <button class="sub-btn" id="stop-btn">停止</button>
     </section>
 
   </main>

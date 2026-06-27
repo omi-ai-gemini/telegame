@@ -61,27 +61,27 @@ const slotFallbackEls = [
 ];
 
 const slotCellEls = Array.from(document.querySelectorAll(".slot-cell"));
-const statusTextEl = document.getElementById("status-text");
-const spinCountEl = document.getElementById("spin-count");
-const lastResultEl = document.getElementById("last-result");
-const betNoteEl = document.getElementById("bet-note");
 const betButtons = Array.from(document.querySelectorAll(".bet-btn"));
+
+const betNoteEl = document.getElementById("bet-note");
+const statusTextEl = document.getElementById("status-text");
 
 const spinOnceBtn = document.getElementById("spin-once-btn");
 const spinTenBtn = document.getElementById("spin-ten-btn");
 const autoSpinBtn = document.getElementById("auto-spin-btn");
 const stopBtn = document.getElementById("stop-btn");
 
+const leverEl = document.getElementById("machine-lever");
+
 let selectedBet = 100;
-let spinCount = 0;
-let spinning = false;
-let autoTimer = null;
+let isSpinning = false;
+let runMode = null;       // null | "single" | "ten" | "auto"
+let stopRequested = false;
 
 
 // =========================
 // 從本地符號池公平隨機一個符號
-// 只用於轉動動畫，不當作最終結果
-// 最終結果仍以後端 API 回傳為準
+// 只用於動畫
 // =========================
 function randomSymbol() {
   const index = Math.floor(Math.random() * SYMBOLS.length);
@@ -91,8 +91,7 @@ function randomSymbol() {
 
 
 // =========================
-// 依 id 找符號資料
-// 後端回傳同樣的 id，前端補上圖片路徑
+// 依 id 找符號
 // =========================
 function findSymbol(symbol) {
   return SYMBOLS.find((item) => item.id === symbol.id) || symbol;
@@ -101,7 +100,7 @@ function findSymbol(symbol) {
 
 // =========================
 // 設定單格符號
-// 如果未來圖片還沒放進 assets，會自動退回 emoji 顯示
+// 若圖片不存在，退回 emoji
 // =========================
 function setSlotSymbol(index, symbol) {
   const normalizedSymbol = findSymbol(symbol);
@@ -110,7 +109,6 @@ function setSlotSymbol(index, symbol) {
 
   fallbackEl.textContent = normalizedSymbol.emoji || "❔";
   imageEl.alt = normalizedSymbol.name || "拉霸符號";
-  imageEl.src = normalizedSymbol.image || "";
 
   imageEl.onload = () => {
     imageEl.style.display = "block";
@@ -121,12 +119,13 @@ function setSlotSymbol(index, symbol) {
     imageEl.style.display = "none";
     fallbackEl.style.display = "inline";
   };
+
+  imageEl.src = normalizedSymbol.image || "";
 }
 
 
 // =========================
-// 更新下注 UI
-// 目前只做顯示，不扣幣
+// 更新下注顯示
 // =========================
 function setSelectedBet(amount) {
   selectedBet = Number(amount);
@@ -142,7 +141,7 @@ function setSelectedBet(amount) {
 
 
 // =========================
-// 呼叫後端取得公平五格結果
+// 呼叫後端取得公平結果
 // =========================
 async function requestSpinResult() {
   const res = await fetch("/games/cat-slot/api/spin", {
@@ -166,15 +165,45 @@ async function requestSpinResult() {
 
 
 // =========================
-// 播放一次假轉動動畫，再停到後端結果
+// 拉桿動畫
 // =========================
-async function spinOnce() {
-  if (spinning) {
+function triggerLeverAnimation() {
+  leverEl.classList.remove("pulling");
+
+  void leverEl.offsetWidth;
+
+  leverEl.classList.add("pulling");
+}
+
+
+// =========================
+// 控制按鈕狀態
+// 停止按鈕永遠保留最高權限
+// =========================
+function setRunningState(running) {
+  betButtons.forEach((button) => {
+    button.disabled = running;
+  });
+
+  spinOnceBtn.disabled = running;
+  spinTenBtn.disabled = running;
+  autoSpinBtn.disabled = running;
+  stopBtn.disabled = false;
+}
+
+
+// =========================
+// 單次轉動
+// 若 stopRequested = true，也會先完成這一次
+// 但不會再開始下一次
+// =========================
+async function performSingleSpin() {
+  if (isSpinning) {
     return;
   }
 
-  spinning = true;
-  setButtonsDisabled(true);
+  isSpinning = true;
+  triggerLeverAnimation();
   statusTextEl.textContent = "轉動中...";
 
   slotCellEls.forEach((cell) => {
@@ -191,86 +220,110 @@ async function spinOnce() {
   try {
     const result = await requestSpinResult();
 
-    await wait(650);
+    await wait(620);
     clearInterval(animationTimer);
 
     for (let i = 0; i < 5; i += 1) {
-      await wait(110);
+      await wait(95);
 
       slotCellEls[i].classList.remove("spinning");
       slotCellEls[i].classList.add("stopped");
       setSlotSymbol(i, result[i]);
     }
 
-    spinCount += 1;
-    spinCountEl.textContent = spinCount;
-    lastResultEl.textContent = result.map((symbol) => symbol.name).join("｜");
-    statusTextEl.textContent = `完成，下注額 ${selectedBet.toLocaleString()} 貓咪幣（測試版未扣幣）`;
+    if (stopRequested) {
+      statusTextEl.textContent = "已停止";
+    } else {
+      statusTextEl.textContent = `完成，下注額 ${selectedBet.toLocaleString()} 貓咪幣（測試版未扣幣）`;
+    }
   } catch (error) {
     console.error(error);
     clearInterval(animationTimer);
     statusTextEl.textContent = "轉動失敗";
   } finally {
-    spinning = false;
-    setButtonsDisabled(false);
+    isSpinning = false;
   }
 }
 
 
 // =========================
-// 連續轉十次
-// 中獎與扣幣尚未接入，只測轉動流程
+// 執行模式
+// single / ten / auto
+// 停止只會阻止下一次開始
 // =========================
-async function spinTen() {
-  stopAutoSpin();
-
-  for (let i = 0; i < 10; i += 1) {
-    await spinOnce();
-  }
-
-  statusTextEl.textContent = "十次轉動完成（測試版未結算）";
-}
-
-
-// =========================
-// 無限轉
-// 目前不檢查餘額，正式版會改成直到貓咪幣不足
-// =========================
-function startAutoSpin() {
-  if (autoTimer) {
+async function runSpinMode(mode) {
+  if (runMode || isSpinning) {
     return;
   }
 
-  statusTextEl.textContent = "無限轉測試中，按停止可中斷";
+  runMode = mode;
+  stopRequested = false;
+  setRunningState(true);
 
-  autoTimer = setInterval(async () => {
-    if (!spinning) {
-      await spinOnce();
+  try {
+    if (mode === "single") {
+      await performSingleSpin();
+      return;
     }
-  }, 950);
-}
 
+    if (mode === "ten") {
+      for (let i = 0; i < 10; i += 1) {
+        if (stopRequested) {
+          break;
+        }
 
-// =========================
-// 停止無限轉
-// =========================
-function stopAutoSpin() {
-  if (autoTimer) {
-    clearInterval(autoTimer);
-    autoTimer = null;
-    statusTextEl.textContent = "已停止";
+        await performSingleSpin();
+
+        if (stopRequested) {
+          break;
+        }
+
+        if (i < 9) {
+          await wait(110);
+        }
+      }
+
+      if (!stopRequested) {
+        statusTextEl.textContent = "十次轉動完成";
+      }
+
+      return;
+    }
+
+    if (mode === "auto") {
+      while (!stopRequested) {
+        await performSingleSpin();
+
+        if (stopRequested) {
+          break;
+        }
+
+        await wait(110);
+      }
+
+      statusTextEl.textContent = "已停止";
+    }
+  } finally {
+    runMode = null;
+    stopRequested = false;
+    setRunningState(false);
   }
 }
 
 
 // =========================
-// 控制按鈕狀態
-// 無限轉期間允許按停止
+// 停止優先權最高
+// 當前轉動不打斷
+// 但會阻止下一次開始
 // =========================
-function setButtonsDisabled(disabled) {
-  spinOnceBtn.disabled = disabled;
-  spinTenBtn.disabled = disabled;
-  autoSpinBtn.disabled = disabled;
+function stopCurrentMode() {
+  stopRequested = true;
+
+  if (isSpinning) {
+    statusTextEl.textContent = "停止中，將在本次轉動結束後停止";
+  } else {
+    statusTextEl.textContent = "已停止";
+  }
 }
 
 
@@ -284,27 +337,35 @@ function wait(ms) {
 // =========================
 betButtons.forEach((button) => {
   button.addEventListener("click", () => {
+    if (runMode || isSpinning) {
+      return;
+    }
+
     setSelectedBet(button.dataset.bet);
   });
 });
 
 spinOnceBtn.addEventListener("click", () => {
-  stopAutoSpin();
-  spinOnce();
+  runSpinMode("single");
 });
 
-spinTenBtn.addEventListener("click", spinTen);
+spinTenBtn.addEventListener("click", () => {
+  runSpinMode("ten");
+});
 
-autoSpinBtn.addEventListener("click", startAutoSpin);
+autoSpinBtn.addEventListener("click", () => {
+  runSpinMode("auto");
+});
 
-stopBtn.addEventListener("click", stopAutoSpin);
+stopBtn.addEventListener("click", stopCurrentMode);
 
 
 // =========================
-// 初始化五格畫面
+// 初始化
 // =========================
 for (let i = 0; i < 5; i += 1) {
   setSlotSymbol(i, SYMBOLS[i]);
 }
 
 setSelectedBet(selectedBet);
+setRunningState(false);
