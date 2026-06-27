@@ -18,9 +18,12 @@
 
   <main class="game">
 
-    <section class="header-card">
-      <div class="game-title">🐱 貓咪拉霸機</div>
-      <div class="game-subtitle">五格直線｜公平轉動測試版</div>
+    <section class="top-banner">
+      <div class="top-banner-icon">🎰</div>
+      <div>
+        <div class="top-banner-title">貓咪拉霸機</div>
+        <div class="top-banner-subtitle">明亮版測試機台｜五格直線</div>
+      </div>
     </section>
 
     <section class="card balance-card">
@@ -49,35 +52,55 @@
       <div class="bet-note" id="bet-note">目前選擇：100 貓咪幣</div>
     </section>
 
-    <section class="card slot-card">
-      <div class="slot-window">
-        <div class="slot-cell" data-index="0">
-          <img id="slot-0" alt="拉霸符號 1">
-          <span id="slot-fallback-0">🐈‍⬛</span>
+    <section class="slot-machine-card">
+      <div class="machine-top-lights"></div>
+
+      <div class="machine-header">
+        <div class="machine-jackpot">MEOW SLOT</div>
+        <div class="machine-mini-display">Lucky Cats × TLC</div>
+      </div>
+
+      <div class="machine-body">
+        <div class="slot-machine-frame">
+
+          <div class="slot-window">
+            <div class="slot-cell" data-index="0">
+              <img id="slot-0" alt="拉霸符號 1">
+              <span id="slot-fallback-0">🐈‍⬛</span>
+            </div>
+
+            <div class="slot-cell" data-index="1">
+              <img id="slot-1" alt="拉霸符號 2">
+              <span id="slot-fallback-1">🐱</span>
+            </div>
+
+            <div class="slot-cell" data-index="2">
+              <img id="slot-2" alt="拉霸符號 3">
+              <span id="slot-fallback-2">🤍</span>
+            </div>
+
+            <div class="slot-cell" data-index="3">
+              <img id="slot-3" alt="拉霸符號 4">
+              <span id="slot-fallback-3">🌼</span>
+            </div>
+
+            <div class="slot-cell" data-index="4">
+              <img id="slot-4" alt="拉霸符號 5">
+              <span id="slot-fallback-4">🪙</span>
+            </div>
+          </div>
+
         </div>
 
-        <div class="slot-cell" data-index="1">
-          <img id="slot-1" alt="拉霸符號 2">
-          <span id="slot-fallback-1">🐱</span>
-        </div>
-
-        <div class="slot-cell" data-index="2">
-          <img id="slot-2" alt="拉霸符號 3">
-          <span id="slot-fallback-2">🤍</span>
-        </div>
-
-        <div class="slot-cell" data-index="3">
-          <img id="slot-3" alt="拉霸符號 4">
-          <span id="slot-fallback-3">🌼</span>
-        </div>
-
-        <div class="slot-cell" data-index="4">
-          <img id="slot-4" alt="拉霸符號 5">
-          <span id="slot-fallback-4">🪙</span>
+        <div class="slot-side-decoration">
+          <div class="lever-knob"></div>
+          <div class="lever-stick"></div>
         </div>
       </div>
 
-      <div class="status" id="status-text">素材測試版已就緒</div>
+      <div class="machine-footer">
+        <div class="status" id="status-text">素材測試版已就緒</div>
+      </div>
     </section>
 
     <section class="card summary-card">
