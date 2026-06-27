@@ -110,6 +110,46 @@ body {
   font-size: 18px;
 }
 
+.history-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.history-list {
+  max-height: 132px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.history-row,
+.history-empty {
+  min-height: 38px;
+  padding: 9px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.20);
+  font-size: 14px;
+}
+
+.history-row + .history-row {
+  margin-top: 6px;
+}
+
+.history-empty {
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.52);
+}
+
+.history-code {
+  color: rgba(255, 255, 255, 0.62);
+}
+
+.history-reward {
+  font-weight: 900;
+}
+
 .actions {
   margin-top: 18px;
 }
