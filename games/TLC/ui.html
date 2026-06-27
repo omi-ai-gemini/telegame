@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>TeleCoin</title>
+
+  <link rel="stylesheet" href="/games/tlc/ui.css">
+
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+
+  <main class="game">
+
+    <section class="header-card">
+      <div class="game-title">🪙 TeleCoin</div>
+      <div class="game-subtitle">破解目標碼，取得 TLC 產出判定</div>
+    </section>
+
+    <section class="card">
+      <div class="card-title">目標碼</div>
+
+      <div class="target-grid">
+        <div class="target-code" id="target-0">----</div>
+        <div class="target-code" id="target-1">----</div>
+        <div class="target-code" id="target-2">----</div>
+        <div class="target-code" id="target-3">----</div>
+      </div>
+    </section>
+
+    <section class="card scan-card">
+      <div class="card-title">目前嘗試碼</div>
+
+      <div class="current-code" id="current-code">0000</div>
+
+      <div class="status" id="status-text">初始化中</div>
+    </section>
+
+    <section class="card asset-card">
+      <div class="asset-row">
+        <span>目前持有</span>
+        <strong id="tlc-amount">0 TLC</strong>
+      </div>
+
+      <div class="asset-row">
+        <span>嘗試次數</span>
+        <strong id="try-count">0</strong>
+      </div>
+    </section>
+
+    <section class="actions">
+      <button class="main-btn" id="start-btn">開始 TLC</button>
+      <button class="sub-btn" id="stop-btn">停止</button>
+    </section>
+
+  </main>
+
+  <script src="/games/tlc/ui.js"></script>
+</body>
+</html>
