@@ -4,6 +4,11 @@ from games.TLC.flow import (
     TLC_GAME,
     handle_tlc_command
 )
+from games.CAT_SLOT.flow import (
+    cat_slot_bp,
+    CAT_SLOT_GAME,
+    handle_cat_slot_command
+)
 
 
 # =========================
@@ -11,13 +16,14 @@ from games.TLC.flow import (
 # 之後新增遊戲只加在這裡
 # =========================
 GAME_BLUEPRINTS = [
-    tlc_bp
+    tlc_bp,
+    cat_slot_bp
 ]
 
 
 # =========================
 # 所有遊戲資料
-# 之後 slot、其他遊戲也加在這裡
+# 新遊戲只要在這裡新增一筆
 # =========================
 GAMES = [
     {
@@ -27,6 +33,14 @@ GAMES = [
         "path": TLC_GAME["path"],
         "commands": TLC_GAME["commands"],
         "handler": handle_tlc_command
+    },
+    {
+        "id": CAT_SLOT_GAME["id"],
+        "title": CAT_SLOT_GAME["title"],
+        "button_text": CAT_SLOT_GAME["button_text"],
+        "path": CAT_SLOT_GAME["path"],
+        "commands": CAT_SLOT_GAME["commands"],
+        "handler": handle_cat_slot_command
     }
 ]
 
@@ -60,7 +74,7 @@ def send_game_menu(bot_id, chat_id, telegram_post):
     for game in GAMES:
         # =========================
         # WebApp 帶入 bot_id
-        # 前端才能把同一個 Telegram user 的資源分 bot 儲存
+        # 前端才能知道目前是從哪隻 bot 開啟
         # =========================
         keyboard.append([
             {
