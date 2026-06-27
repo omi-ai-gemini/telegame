@@ -22,8 +22,8 @@ def get_conn():
 
 # =========================
 # 初始化資料表
-# 目前只建立 bot_config
-# 之後玩家資料、TLC 餘額、遊戲紀錄再另外擴充
+# database.py 只負責全域 DB 連線與建表
+# 實際讀取 / 儲存資源交給 resource_service.py
 # =========================
 def init_db():
     conn = get_conn()
@@ -31,12 +31,37 @@ def init_db():
     try:
         cursor = conn.cursor()
 
+        # =========================
+        # Bot 設定表
+        # 儲存每隻 Telegram Bot 的 token
+        # =========================
         cursor.execute("""
         CREATE TABLE IF NOT EXISTS bot_config (
             bot_id TEXT PRIMARY KEY,
             token TEXT NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+        """)
+
+        # =========================
+        # 全遊戲共用玩家資源表
+        # 所有遊戲、所有資源都寫在這一張
+        # 例：TLC、ENERGY、TICKET、SLOT_POINT
+        # =========================
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS player_resources (
+            id SERIAL PRIMARY KEY,
+
+            bot_id TEXT NOT NULL,
+            user_id TEXT NOT NULL,
+
+            resource_key TEXT NOT NULL,
+            amount BIGINT NOT NULL DEFAULT 0 CHECK (amount >= 0),
+
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+            UNIQUE (bot_id, user_id, resource_key)
         )
         """)
 

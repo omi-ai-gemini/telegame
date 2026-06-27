@@ -58,11 +58,15 @@ def send_game_menu(bot_id, chat_id, telegram_post):
     keyboard = []
 
     for game in GAMES:
+        # =========================
+        # WebApp 帶入 bot_id
+        # 前端才能把同一個 Telegram user 的資源分 bot 儲存
+        # =========================
         keyboard.append([
             {
                 "text": game["button_text"],
                 "web_app": {
-                    "url": f"{BASE_URL}{game['path']}"
+                    "url": f"{BASE_URL}{game['path']}?bot_id={bot_id}"
                 }
             }
         ])

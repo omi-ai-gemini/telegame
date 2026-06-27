@@ -1,8 +1,9 @@
-from flask import Blueprint, send_from_directory, jsonify
+from flask import Blueprint, send_from_directory, jsonify, request
 from pathlib import Path
 
 from config import BASE_URL
-from games.TLC.logic import generate_target_codes
+from games.TLC.logic import generate_target_codes, generate_tlc_reward
+from resource_service import add_resource, get_resource
 
 
 # =========================
@@ -32,6 +33,33 @@ TLC_GAME = {
 tlc_bp = Blueprint("tlc", __name__)
 
 BASE_DIR = Path(__file__).resolve().parent
+TLC_RESOURCE_KEY = "TLC"
+
+
+# =========================
+# 檢查前端傳來的玩家資料
+# bot_id 來自 WebApp URL 參數
+# user_id 來自 Telegram WebApp initDataUnsafe.user.id
+# =========================
+def _read_player_payload(data=None):
+    data = data or {}
+
+    bot_id = str(data.get("bot_id") or request.args.get("bot_id") or "").strip()
+    user_id = str(data.get("user_id") or request.args.get("user_id") or "").strip()
+
+    if not bot_id:
+        return None, None, (jsonify({
+            "ok": False,
+            "error": "missing_bot_id"
+        }), 400)
+
+    if not user_id:
+        return None, None, (jsonify({
+            "ok": False,
+            "error": "missing_user_id"
+        }), 400)
+
+    return bot_id, user_id, None
 
 
 # =========================
@@ -50,7 +78,11 @@ def handle_tlc_command(bot_id, chat_id, telegram_post):
         )
         return
 
-    game_url = f"{BASE_URL}{TLC_GAME['path']}"
+    # =========================
+    # WebApp 要帶 bot_id
+    # 否則前端只知道 user_id，無法分辨是哪隻 bot 的資源
+    # =========================
+    game_url = f"{BASE_URL}{TLC_GAME['path']}?bot_id={bot_id}"
 
     telegram_post(
         bot_id,
@@ -100,11 +132,66 @@ def tlc_js():
 
 # =========================
 # TLC 目標碼 API
-# 目前只給前端產生四組目標碼
-# 尚未做產出、TLC 寫入、玩家資料
+# 目前只給前端取得四組目標碼
+# 目標碼不顯示在畫面，只用於前端判定命中
 # =========================
 @tlc_bp.route("/games/tlc/api/targets", methods=["GET"])
 def tlc_targets():
     return jsonify({
         "target_codes": generate_target_codes()
+    })
+
+
+# =========================
+# TLC 餘額 API
+# 從全遊戲共用 player_resources 讀取目前持有 TLC
+# =========================
+@tlc_bp.route("/games/tlc/api/balance", methods=["GET"])
+def tlc_balance():
+    bot_id, user_id, error_response = _read_player_payload()
+
+    if error_response:
+        return error_response
+
+    amount = get_resource(
+        bot_id=bot_id,
+        user_id=user_id,
+        resource_key=TLC_RESOURCE_KEY
+    )
+
+    return jsonify({
+        "ok": True,
+        "resource_key": TLC_RESOURCE_KEY,
+        "amount": amount
+    })
+
+
+# =========================
+# TLC 命中產出 API
+# 產出由後端判定，並寫入全遊戲共用 player_resources
+# 前端只負責顯示回傳結果
+# =========================
+@tlc_bp.route("/games/tlc/api/reward", methods=["POST"])
+def tlc_reward():
+    data = request.get_json(silent=True) or {}
+
+    bot_id, user_id, error_response = _read_player_payload(data)
+
+    if error_response:
+        return error_response
+
+    reward = generate_tlc_reward()
+
+    amount = add_resource(
+        bot_id=bot_id,
+        user_id=user_id,
+        resource_key=TLC_RESOURCE_KEY,
+        amount=reward
+    )
+
+    return jsonify({
+        "ok": True,
+        "resource_key": TLC_RESOURCE_KEY,
+        "reward": reward,
+        "amount": amount
     })

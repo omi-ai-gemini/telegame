@@ -14,6 +14,12 @@ const historyListEl = document.getElementById("history-list");
 const startBtn = document.getElementById("start-btn");
 const stopBtn = document.getElementById("stop-btn");
 
+const urlParams = new URLSearchParams(window.location.search);
+const botId = urlParams.get("bot_id") || "";
+const userId = tg?.initDataUnsafe?.user?.id
+  ? String(tg.initDataUnsafe.user.id)
+  : "";
+
 let targetCodes = [];
 let timer = null;
 let tryCount = 0;
@@ -21,6 +27,17 @@ let hitCount = 0;
 let tlc = 0;
 let historyRecords = [];
 let targetLoading = false;
+let resolvingHit = false;
+
+
+// =========================
+// 確認是否能使用後端資源 API
+// bot_id 由 WebApp URL 帶入
+// user_id 由 Telegram WebApp 提供
+// =========================
+function hasPlayerIdentity() {
+  return botId && userId;
+}
 
 
 // =========================
@@ -32,22 +49,6 @@ function generateCode() {
   const number = Math.floor(Math.random() * 10000);
 
   return String(number).padStart(4, "0");
-}
-
-
-// =========================
-// 命中後產出 TLC
-// 目前只用前端亂數，不寫 DB
-// 0 代表空包
-// =========================
-function generateTlcReward() {
-  const isEmpty = Math.random() < 0.3;
-
-  if (isEmpty) {
-    return 0;
-  }
-
-  return Math.floor(Math.random() * 10) + 1;
 }
 
 
@@ -77,9 +78,71 @@ async function loadTargetCodes() {
 
 
 // =========================
+// 從 DB 讀取目前 TLC 持有量
+// =========================
+async function loadBalance() {
+  if (!hasPlayerIdentity()) {
+    console.warn("missing player identity", { botId, userId });
+    return;
+  }
+
+  try {
+    const query = new URLSearchParams({
+      bot_id: botId,
+      user_id: userId
+    });
+
+    const res = await fetch(`/games/tlc/api/balance?${query.toString()}`);
+    const data = await res.json();
+
+    if (!res.ok || !data.ok) {
+      throw new Error(data.error || "balance_load_failed");
+    }
+
+    tlc = Number(data.amount || 0);
+
+    renderPlayerState();
+  } catch (error) {
+    console.error(error);
+    statusTextEl.textContent = "TLC 餘額讀取失敗";
+  }
+}
+
+
+// =========================
+// 命中後向後端領取 TLC
+// 產出數量由後端判定，並寫入 DB
+// =========================
+async function claimTlcReward() {
+  if (!hasPlayerIdentity()) {
+    throw new Error("missing_player_identity");
+  }
+
+  const res = await fetch("/games/tlc/api/reward", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      bot_id: botId,
+      user_id: userId
+    })
+  });
+
+  const data = await res.json();
+
+  if (!res.ok || !data.ok) {
+    throw new Error(data.error || "reward_claim_failed");
+  }
+
+  return data;
+}
+
+
+// =========================
 // 更新畫面資料
-// 目前 TLC 尚未寫 DB
-// 這裡只是前端顯示用
+// TLC 持有量來自 DB 回傳
+// 嘗試次數只記錄本次遊玩
 // =========================
 function renderPlayerState() {
   tlcAmountEl.textContent = `${tlc} TLC`;
@@ -113,6 +176,7 @@ function renderHistoryRecords() {
 
 // =========================
 // 新增命中紀錄
+// 歷史紀錄只存在本次前端 RAM，不寫 DB
 // =========================
 function addHistoryRecord(code, reward) {
   hitCount += 1;
@@ -128,14 +192,37 @@ function addHistoryRecord(code, reward) {
 
 
 // =========================
-// 命中後刷新下一輪目標碼
+// 命中後結算 TLC，再刷新下一輪目標碼
 // 不停止遊戲，讓破譯繼續跑
 // =========================
-async function continueAfterHit() {
-  await loadTargetCodes();
+async function handleHit(code) {
+  resolvingHit = true;
 
-  if (timer) {
-    statusTextEl.textContent = "命中完成，繼續破譯中...";
+  try {
+    statusTextEl.textContent = `命中 ${code}，結算中...`;
+
+    const result = await claimTlcReward();
+    const reward = Number(result.reward || 0);
+
+    tlc = Number(result.amount || 0);
+
+    addHistoryRecord(code, reward);
+    renderPlayerState();
+
+    statusTextEl.textContent = `命中 ${code}，產出 ${reward} TLC`;
+
+    await loadTargetCodes();
+
+    if (timer) {
+      statusTextEl.textContent = "命中完成，繼續破譯中...";
+    }
+  } catch (error) {
+    console.error(error);
+
+    stopTlc();
+    statusTextEl.textContent = "產出寫入失敗，已停止";
+  } finally {
+    resolvingHit = false;
   }
 }
 
@@ -144,7 +231,7 @@ async function continueAfterHit() {
 // 嘗試一次
 // =========================
 function tryOnce() {
-  if (targetLoading || targetCodes.length === 0) {
+  if (targetLoading || resolvingHit || targetCodes.length === 0) {
     statusTextEl.textContent = "等待破譯資料...";
     return;
   }
@@ -157,17 +244,10 @@ function tryOnce() {
   currentCodeEl.classList.remove("hit");
 
   if (targetCodes.includes(code)) {
-    const reward = generateTlcReward();
-
-    tlc += reward;
-
     currentCodeEl.classList.add("hit");
-    statusTextEl.textContent = `命中 ${code}，產出 ${reward} TLC`;
 
-    addHistoryRecord(code, reward);
     renderPlayerState();
-
-    continueAfterHit();
+    handleHit(code);
 
     return;
   }
@@ -192,6 +272,7 @@ async function startTlc() {
 
   renderHistoryRecords();
 
+  await loadBalance();
   await loadTargetCodes();
 
   renderPlayerState();
@@ -229,6 +310,7 @@ stopBtn.addEventListener("click", () => {
 // =========================
 // 初始化
 // =========================
+loadBalance();
 loadTargetCodes();
 renderPlayerState();
 renderHistoryRecords();
